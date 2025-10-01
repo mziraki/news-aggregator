@@ -82,6 +82,7 @@ Prefix: `/api/v1`
 
 | Method | Endpoint            | Description                                            |
 |--------|---------------------|--------------------------------------------------------|
+| GET    | /categories         | List article categories                                |
 | GET    | /articles           | List articles with filters                             |
 | GET    | /articles/{article} | Show a single article                                  |
 | GET    | /articles/preferred | List articles with user preferred filters              |

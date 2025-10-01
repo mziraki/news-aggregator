@@ -2,6 +2,7 @@
 
 use App\Models\User;
 use App\Repositories\Contracts\ArticleRepositoryInterface;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Laravel\Sanctum\Sanctum;
 
@@ -21,6 +22,14 @@ it('uses repository search in index endpoint', function () {
         ->andReturn($paginator);
 
     $this->getJson('/api/v1/articles?q=test')->assertOk();
+});
+
+it('uses repository getCategories in categories endpoint', function () {
+    $this->repo->shouldReceive('getCategories')
+        ->once()
+        ->andReturn(new Collection);
+
+    $this->getJson('/api/v1/categories')->assertOk();
 });
 
 it('uses repository getPreferredForUser in preferred endpoint', function () {

@@ -3,9 +3,11 @@
 namespace App\Repositories;
 
 use App\Models\Article;
+use App\Models\Category;
 use App\Models\User;
 use App\Repositories\Contracts\ArticleRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Collection;
 
 class ArticleRepository implements ArticleRepositoryInterface
 {
@@ -25,6 +27,11 @@ class ArticleRepository implements ArticleRepositoryInterface
             ->unless(empty($filters['author']), fn ($query) => $query->where('author', 'like', '%'.$filters['author'].'%'))
             ->orderBy('published_at', 'desc')
             ->paginate($filters['perPage'] ?? null);
+    }
+
+    public function getCategories(): Collection
+    {
+        return Category::all(['name', 'slug']);
     }
 
     public function getPreferredForUser(int $userId, int $perPage): LengthAwarePaginator
