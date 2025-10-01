@@ -24,14 +24,16 @@ class NewsAggregatorService
 
                 foreach ($items as $item) {
                     $externalId = $item['external_id'] ?? null;
-                    $articleQuery = Article::where('source_id', $source->id)
-                        ->when($externalId, fn ($q) => $q->where('external_id', $externalId));
 
-                    if (! $externalId && ! empty($item['url'])) {
-                        $articleQuery = Article::where('url', $item['url']);
-                    }
-
-                    $article = $articleQuery->first();
+                    $article = Article::query()
+                        ->when(
+                            ! $externalId && ! empty($item['url']),
+                            fn ($query) => $query->where('url', $item['url']),
+                            fn ($query) => $query
+                                ->where('source_id', $source->id)
+                                ->when($externalId, fn ($q) => $q->where('external_id', $externalId))
+                        )
+                        ->first();
 
                     $data = [
                         'source_id' => $source->id,
