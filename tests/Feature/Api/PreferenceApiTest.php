@@ -10,7 +10,6 @@ beforeEach(function () {
     $this->user = User::factory()->create();
     Sanctum::actingAs($this->user, ['*']);
 
-    // Create valid entries
     Source::factory()->create(['key' => 'nyt', 'name' => 'Nyt']);
     Category::factory()->create(['name' => 'Sports', 'slug' => 'sports']);
 

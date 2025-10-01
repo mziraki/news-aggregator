@@ -11,7 +11,6 @@ beforeEach(function () {
 });
 
 it('saves preferences to DB', function () {
-    // Create valid entries
     Source::factory()->create(['key' => 'guardian', 'name' => 'Guardian']);
     Category::factory()->create(['name' => 'Technology', 'slug' => 'technology']);
 
