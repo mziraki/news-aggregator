@@ -10,11 +10,11 @@ class NewsApiService implements NewsProviderInterface
     public function fetch(?string $query = null): array
     {
         $q = $query ?: 'news';
-        $response = Http::timeout(10)->get('https://newsapi.org/v2/everything', [
+        $response = Http::get('https://newsapi.org/v2/everything', [
             'q' => $q,
             'apiKey' => config('services.newsapi.key'),
             'language' => 'en',
-            'pageSize' => 50,
+            'pageSize' => config('services.newsapi.page_size'),
         ]);
 
         if (! $response->successful()) {

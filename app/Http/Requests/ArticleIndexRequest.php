@@ -16,7 +16,7 @@ class ArticleIndexRequest extends FormRequest
             'to' => 'nullable|date|after_or_equal:from',
             'author' => 'nullable|string|max:255',
             'page' => 'nullable|integer|min:1',
-            'perPage' => 'nullable|integer|between:20,50',
+            'perPage' => 'nullable|integer|between:'.config('pagination.per_page').','.config('pagination.max_per_page'),
         ];
     }
 

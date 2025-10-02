@@ -9,18 +9,21 @@ class NytService implements NewsProviderInterface
 {
     public function fetch(?string $query = null): array
     {
+        $pages = range(0, config('services.nytimes.page_limit') - 1);
         $q = $query ?: 'news';
-        $response = Http::timeout(10)->get('https://api.nytimes.com/svc/search/v2/articlesearch.json', [
+        $responses = Http::pool(fn ($pool) => collect($pages)->map(fn ($page) => $pool->get('https://api.nytimes.com/svc/search/v2/articlesearch.json', [
             'q' => $q,
             'api-key' => config('services.nytimes.key'),
-            'page' => 0,
-        ]);
+            'page' => $page,
+        ])
+        )->toArray());
 
-        if (! $response->successful()) {
-            return [];
+        $items = [];
+        foreach ($responses as $i => $resp) {
+            if ($resp->successful()) {
+                $items = array_merge($items, $resp->json('response.docs', []));
+            }
         }
-
-        $items = $response->json('response.docs', []);
 
         return array_map(function ($item) {
             return [

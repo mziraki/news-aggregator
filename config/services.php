@@ -37,14 +37,17 @@ return [
 
     'nytimes' => [
         'key' => env('NYTIMES_KEY'),
+        'page_limit' => env('NYTIMES_PAGE_LIMIT', 5), // NYTimes give 10 articles at most per page
     ],
 
     'guardian' => [
         'key' => env('GUARDIAN_KEY'),
+        'page_size' => env('GUARDIAN_PAGE_SIZE', 50),
     ],
 
     'newsapi' => [
         'key' => env('NEWSAPI_KEY'),
+        'page_size' => env('NEWSAPI_PAGE_SIZE', 50),
     ],
 
 ];

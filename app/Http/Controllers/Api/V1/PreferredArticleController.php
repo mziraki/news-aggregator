@@ -13,6 +13,11 @@ class PreferredArticleController extends Controller
 
     public function index(PreferredArticleIndexRequest $request)
     {
-        return ArticleResource::collection($this->articles->getPreferredForUser($request->user()->id, $request->input('perPage', 20)));
+        return ArticleResource::collection(
+            $this->articles->getPreferredForUser(
+                $request->user()->id,
+                $request->input('perPage', config('pagination.per_page'))
+            )
+        );
     }
 }

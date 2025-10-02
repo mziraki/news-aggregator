@@ -10,11 +10,11 @@ class GuardianService implements NewsProviderInterface
     public function fetch(?string $query = null): array
     {
         $q = $query ?: 'news';
-        $response = Http::timeout(10)->get('https://content.guardianapis.com/search', [
+        $response = Http::get('https://content.guardianapis.com/search', [
             'q' => $q,
             'api-key' => config('services.guardian.key'),
             'show-fields' => 'trailText,bodyText,thumbnail',
-            'page-size' => 50,
+            'page-size' => config('services.guardian.page_size'),
         ]);
 
         if (! $response->successful()) {

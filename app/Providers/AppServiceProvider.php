@@ -7,6 +7,7 @@ use App\Services\News\NewsAggregatorService;
 use App\Services\News\NewsApiService;
 use App\Services\News\NytService;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -31,5 +32,10 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Model::unguard();
+
+        Http::swap(Http::withOptions([
+            'timeout' => config('http.timeout'),
+            'connect_timeout' => config('http.connect_timeout'),
+        ]));
     }
 }
