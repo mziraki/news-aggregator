@@ -9,7 +9,8 @@ class ArticleResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'id' => $this->id,
+            'id' => $this->getKey(),
+            'source_key' => $this->source_key,
             'title' => $this->title,
             'summary' => $this->summary,
             'body' => $this->body,
@@ -17,12 +18,7 @@ class ArticleResource extends JsonResource
             'image_url' => $this->image_url,
             'published_at' => $this->published_at,
             'author' => $this->author,
-            'source' => [
-                'id' => $this->source->id,
-                'name' => $this->source->name,
-                'key' => $this->source->key,
-            ],
-            'categories' => $this->categories->map(fn ($c) => ['id' => $c->id, 'name' => $c->name, 'slug' => $c->slug]),
+            'categories' => $this->categories->map(fn ($c) => ['id' => $c->getKey(), 'name' => $c->name, 'slug' => $c->slug]),
         ];
     }
 }

@@ -12,9 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->json('preferred_sources')->nullable()->after('password');
-            $table->json('preferred_categories')->nullable()->after('preferred_sources');
-            $table->json('preferred_authors')->nullable()->after('preferred_categories');
+            $table->after('password', function ($table) {
+                $table->json('preferred_sources')->nullable();
+                $table->json('preferred_categories')->nullable();
+                $table->json('preferred_authors')->nullable();
+            });
         });
     }
 

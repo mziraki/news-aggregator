@@ -10,7 +10,7 @@ class ArticleIndexRequest extends FormRequest
     {
         return [
             'q' => 'nullable|string|max:255',
-            'source' => 'nullable|string|exists:sources,key',
+            'source' => 'nullable|string|in:'.config('sources.keys'),
             'category' => 'nullable|string|exists:categories,slug',
             'from' => 'nullable|date',
             'to' => 'nullable|date|after_or_equal:from',

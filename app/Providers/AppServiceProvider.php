@@ -2,10 +2,17 @@
 
 namespace App\Providers;
 
-use App\Services\News\GuardianService;
-use App\Services\News\NewsAggregatorService;
-use App\Services\News\NewsApiService;
-use App\Services\News\NytService;
+use App\Services\ArticleService;
+use App\Services\CategoryService;
+use App\Services\Contracts\ArticleServiceContract;
+use App\Services\Contracts\CategoryServiceContract;
+use App\Services\Contracts\NewsAggregatorServiceContract;
+use App\Services\Contracts\UserServiceContract;
+use App\Services\GuardianService;
+use App\Services\NewsAggregatorService;
+use App\Services\NewsApiService;
+use App\Services\NytimesService;
+use App\Services\UserService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\ServiceProvider;
@@ -19,11 +26,16 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->singleton(NewsAggregatorService::class, function ($app) {
             return new NewsAggregatorService([
-                'newsapi' => new NewsApiService,
-                'nyt' => new NytService,
-                'guardian' => new GuardianService,
+                new GuardianService,
+                new NewsApiService,
+                new NytimesService,
             ]);
         });
+
+        $this->app->bind(ArticleServiceContract::class, ArticleService::class);
+        $this->app->bind(CategoryServiceContract::class, CategoryService::class);
+        $this->app->bind(NewsAggregatorServiceContract::class, NewsAggregatorService::class);
+        $this->app->bind(UserServiceContract::class, UserService::class);
     }
 
     /**
@@ -33,9 +45,11 @@ class AppServiceProvider extends ServiceProvider
     {
         Model::unguard();
 
-        Http::swap(Http::withOptions([
-            'timeout' => config('http.timeout'),
-            'connect_timeout' => config('http.connect_timeout'),
-        ]));
+        if (! $this->app->runningUnitTests()) {
+            Http::swap(Http::withOptions([
+                'timeout' => config('http.timeout'),
+                'connect_timeout' => config('http.connect_timeout'),
+            ]));
+        }
     }
 }

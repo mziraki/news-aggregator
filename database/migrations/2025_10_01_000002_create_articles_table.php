@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('articles', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('source_id')->constrained('sources')->cascadeOnDelete();
+            $table->string('source_key')->index()->comment('guardian, newsapi, nytimes');
             $table->string('external_id')->nullable()->index();
             $table->string('title');
             $table->text('summary')->nullable();
@@ -26,7 +26,7 @@ return new class extends Migration
             $table->json('raw_json')->nullable();
             $table->timestamps();
 
-            $table->unique(['source_id', 'external_id']);
+            $table->unique(['source_key', 'external_id']);
         });
     }
 

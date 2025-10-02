@@ -2,16 +2,17 @@
 
 namespace App\Console\Commands;
 
-use App\Services\News\NewsAggregatorService;
+use App\Jobs\FetchNewsProviderJob;
+use App\Services\Contracts\NewsAggregatorServiceContract;
 use Illuminate\Console\Command;
 
 class FetchNewsCommand extends Command
 {
     protected $signature = 'news:fetch {query?}';
 
-    protected $description = 'Fetch news articles from all providers';
+    protected $description = 'Fetch news articles from all providers asynchronously';
 
-    public function __construct(protected NewsAggregatorService $aggregator)
+    public function __construct(protected NewsAggregatorServiceContract $aggregator)
     {
         parent::__construct();
     }
@@ -19,9 +20,12 @@ class FetchNewsCommand extends Command
     public function handle()
     {
         $query = $this->argument('query');
-        $stored = $this->aggregator->fetchAndStore($query);
 
-        $this->info(count($stored).' article(s) has been created/modified.');
+        foreach ($this->aggregator->getProviders() as $provider) {
+            FetchNewsProviderJob::dispatch($provider, $query);
+        }
+
+        $this->info('News fetch jobs dispatched!');
 
         return 0;
     }

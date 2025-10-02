@@ -15,11 +15,6 @@ class Article extends Model
         'raw_json' => 'array',
     ];
 
-    public function source()
-    {
-        return $this->belongsTo(Source::class);
-    }
-
     public function categories()
     {
         return $this->belongsToMany(Category::class);

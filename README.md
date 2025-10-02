@@ -1,6 +1,6 @@
 # Laravel News Aggregator Backend
 
-A Laravel backend for aggregating news from multiple sources (NewsAPI, NYTimes, Guardian), storing them locally, and exposing API endpoints.
+A Laravel backend for aggregating news from multiple sources (Guardian, NewsAPI, NYTimes), storing them locally, and exposing API endpoints.
 
 ---
 
@@ -71,7 +71,8 @@ php artisan news:fetch technology
 The fetch command is scheduled hourly via `bootstrap/app.php`.  
 To run manually:
 ```bash
-php artisan schedule:run
+php artisan queue:work
+php artisan schedule:work
 ```
 
 ---
@@ -84,7 +85,6 @@ Prefix: `/api/v1`
 |--------|---------------------|--------------------------------------------------------|
 | GET    | /categories         | List article categories                                |
 | GET    | /articles           | List articles with filters                             |
-| GET    | /articles/{article} | Show a single article                                  |
 | GET    | /articles/preferred | List articles with user preferred filters              |
 | GET    | /preferences        | Show user preferences (sources, categories, authors)   |
 | PUT    | /preferences        | Update user preferences (sources, categories, authors) |
@@ -92,7 +92,7 @@ Prefix: `/api/v1`
 ### Filters
 
 - `q` – search keyword (title or summary)
-- `source` – filter by source key (`newsapi`, `nyt`, `guardian`)
+- `source` – filter by source key (`guardian`, `newsapi`, `nytimes`)
 - `category` – filter by category slug
 - `from` – published from date (`YYYY-MM-DD`)
 - `to` – published to date (`YYYY-MM-DD`)
@@ -102,7 +102,7 @@ Prefix: `/api/v1`
 
 Example:
 ```
-GET /api/v1/articles?q=tech&source=newsapi&author=alice&category=technology&from=2025-01-01
+GET /api/v1/articles?q=technology&source=newsapi&author=jane&category=technology&from=2025-01-01
 ```
 
 ---
@@ -119,21 +119,10 @@ composer test
 
 Pest tests cover:
 
-- Integrations (Listing articles & Filtering by query, source, author, and category)
-- Services
+- APIs
 - Commands
+- Exceptions
+- Jobs
 - Repositories
-
----
-
-## Project Structure
-
-- `app/Services/News` – API service classes and aggregator
-- `app/Repositories` – App Repositories
-- `app/Http/Controllers/Api/V1` – API controllers
-- `app/Http/Requests` – Request validation
-- `app/Http/Resources` – API Resources
-- `routes/api.php` – API routes
-- `app/Console/Commands/FetchNewsCommand.php` – Fetch command
-- `bootstrap/app.php` – Scheduler
-- `tests` - Pest tests
+- Resources
+- Services

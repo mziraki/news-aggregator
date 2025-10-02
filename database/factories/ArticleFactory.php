@@ -2,7 +2,6 @@
 
 namespace Database\Factories;
 
-use App\Models\Source;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -19,7 +18,7 @@ class ArticleFactory extends Factory
     public function definition(): array
     {
         return [
-            'source_id' => Source::factory(),
+            'source_key' => fake()->randomElement(explode(',', config('sources.keys'))),
             'external_id' => fake()->uuid,
             'title' => fake()->sentence,
             'summary' => fake()->paragraph,

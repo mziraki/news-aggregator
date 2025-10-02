@@ -4,9 +4,9 @@ namespace App\Repositories\Contracts;
 
 use App\Models\User;
 
-interface UserRepositoryInterface
+interface UserRepositoryContract
 {
-    public function getPreferences(int $userId): array;
+    public function getPreferences(int $userId): User;
 
     public function updatePreferences(int $userId, array $preferences): User;
 }

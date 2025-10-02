@@ -3,19 +3,17 @@
 namespace App\Repositories;
 
 use App\Models\User;
-use App\Repositories\Contracts\UserRepositoryInterface;
+use App\Repositories\Contracts\UserRepositoryContract;
 
-class UserRepository implements UserRepositoryInterface
+class UserRepository implements UserRepositoryContract
 {
-    public function getPreferences(int $userId): array
+    public function getPreferences(int $userId): User
     {
-        $user = User::findOrFail($userId);
-
-        return [
-            'preferred_sources' => $user->preferred_sources,
-            'preferred_categories' => $user->preferred_categories,
-            'preferred_authors' => $user->preferred_authors,
-        ];
+        return User::findOrFail($userId, [
+            'preferred_sources',
+            'preferred_categories',
+            'preferred_authors',
+        ]);
     }
 
     public function updatePreferences(int $userId, array $preferences): User
