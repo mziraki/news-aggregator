@@ -3,15 +3,20 @@
 namespace App\Repositories;
 
 use App\Models\Article;
-use App\Models\User;
 use App\Repositories\Contracts\ArticleRepositoryContract;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
-class ArticleRepository implements ArticleRepositoryContract
+class ArticleRepository extends BaseRepository implements ArticleRepositoryContract
 {
+    protected function model(): string
+    {
+        return Article::class;
+    }
+
     public function getArticles(array $filters = []): LengthAwarePaginator
     {
-        return Article::query()
+        return $this
+            ->query()
             ->with('categories')
             ->unless(empty($filters['q']), fn ($query) => $query->where(fn ($q) => $q
                 ->where('title', 'like', '%'.$filters['q'].'%')
@@ -29,9 +34,10 @@ class ArticleRepository implements ArticleRepositoryContract
 
     public function getPreferredArticles(int $userId, int $perPage): LengthAwarePaginator
     {
-        $user = User::findOrFail($userId);
+        $user = (new UserRepository)->query()->findOrFail($userId);
 
-        return Article::query()
+        return $this
+            ->query()
             ->with('categories')
             ->unless(empty($user->preferred_sources), fn ($query) => $query->whereIn('source_key', $user->preferred_sources))
             ->unless(empty($user->preferred_categories), fn ($query) => $query->whereHas('categories', fn ($q) => $q->whereIn('slug', $user->preferred_categories)))

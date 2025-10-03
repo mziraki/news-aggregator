@@ -6,10 +6,15 @@ use App\Models\Category;
 use App\Repositories\Contracts\CategoryRepositoryContract;
 use Illuminate\Database\Eloquent\Collection;
 
-class CategoryRepository implements CategoryRepositoryContract
+class CategoryRepository extends BaseRepository implements CategoryRepositoryContract
 {
+    protected function model(): string
+    {
+        return Category::class;
+    }
+
     public function getCategories(): Collection
     {
-        return Category::all(['name', 'slug']);
+        return $this->query()->get(['name', 'slug']);
     }
 }

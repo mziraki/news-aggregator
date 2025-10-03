@@ -4,21 +4,27 @@ namespace App\Repositories;
 
 use App\Models\User;
 use App\Repositories\Contracts\UserRepositoryContract;
+use Illuminate\Database\Eloquent\Model;
 
-class UserRepository implements UserRepositoryContract
+class UserRepository extends BaseRepository implements UserRepositoryContract
 {
-    public function getPreferences(int $userId): User
+    protected function model(): string
     {
-        return User::findOrFail($userId, [
+        return User::class;
+    }
+
+    public function getPreferences(int $userId): Model
+    {
+        return $this->query()->findOrFail($userId, [
             'preferred_sources',
             'preferred_categories',
             'preferred_authors',
         ]);
     }
 
-    public function updatePreferences(int $userId, array $preferences): User
+    public function updatePreferences(int $userId, array $preferences): Model
     {
-        $user = User::findOrFail($userId);
+        $user = $this->query()->findOrFail($userId);
         $user->update($preferences);
 
         return $user;
