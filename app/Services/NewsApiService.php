@@ -15,7 +15,7 @@ class NewsApiService implements NewsProviderServiceContract
     {
         try {
             $q = $query ?: 'news';
-            $response = Http::get('https://newsapi.org/v2/everything', [
+            $response = Http::get(config('services.newsapi.url'), [
                 'q' => $q,
                 'apiKey' => config('services.newsapi.key'),
                 'language' => 'en',

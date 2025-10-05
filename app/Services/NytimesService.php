@@ -16,12 +16,14 @@ class NytimesService implements NewsProviderServiceContract
         try {
             $pages = range(0, config('services.nytimes.page_limit') - 1);
             $q = $query ?: 'news';
-            $responses = Http::pool(fn ($pool) => collect($pages)->map(fn ($page) => $pool->get('https://api.nytimes.com/svc/search/v2/articlesearch.json', [
-                'q' => $q,
-                'api-key' => config('services.nytimes.key'),
-                'page' => $page,
-            ])
-            )->toArray());
+            $responses = Http::pool(fn ($pool) => collect($pages)->map(fn ($page) => $pool->get(
+                config('services.nytimes.url'),
+                [
+                    'q' => $q,
+                    'api-key' => config('services.nytimes.key'),
+                    'page' => $page,
+                ],
+            ))->toArray());
 
             $items = [];
             foreach ($responses as $i => $resp) {

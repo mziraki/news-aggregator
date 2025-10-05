@@ -35,19 +35,22 @@ return [
         ],
     ],
 
-    'nytimes' => [
-        'key' => env('NYTIMES_KEY'),
-        'page_limit' => env('NYTIMES_PAGE_LIMIT', 5), // NYTimes give 10 articles at most per page
-    ],
-
     'guardian' => [
+        'url' => env('GUARDIAN_URL', 'https://content.guardianapis.com/search'),
         'key' => env('GUARDIAN_KEY'),
         'page_size' => env('GUARDIAN_PAGE_SIZE', 50),
     ],
 
     'newsapi' => [
+        'url' => env('NEWSAPI_URL', 'https://newsapi.org/v2/everything'),
         'key' => env('NEWSAPI_KEY'),
         'page_size' => env('NEWSAPI_PAGE_SIZE', 50),
+    ],
+
+    'nytimes' => [
+        'url' => env('NYTIMES_URL', 'https://api.nytimes.com/svc/search/v2/articlesearch.json'),
+        'key' => env('NYTIMES_KEY'),
+        'page_limit' => env('NYTIMES_PAGE_LIMIT', 5), // NYTimes give 10 articles at most per page
     ],
 
 ];

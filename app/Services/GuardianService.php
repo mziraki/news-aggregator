@@ -15,7 +15,7 @@ class GuardianService implements NewsProviderServiceContract
     {
         try {
             $q = $query ?: 'news';
-            $response = Http::get('https://content.guardianapis.com/search', [
+            $response = Http::get(config('services.guardian.url'), [
                 'q' => $q,
                 'api-key' => config('services.guardian.key'),
                 'show-fields' => 'trailText,bodyText,thumbnail',
