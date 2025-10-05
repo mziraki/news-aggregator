@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Dtos\ArticleDto;
 use App\Exceptions\NewsFetchException;
 use App\Services\Contracts\NewsProviderServiceContract;
 use Exception;
@@ -26,29 +27,22 @@ class NewsApiService implements NewsProviderServiceContract
                 throw new Exception('API returned status '.$response->status());
             }
 
-            return $this->normalize($response->json('articles', []));
+            return array_map(fn ($item) => new ArticleDTO(
+                external_id: $item['url'] ?? null,
+                title: $item['title'] ?? null,
+                summary: $item['description'] ?? null,
+                body: null,
+                url: $item['url'] ?? null,
+                image_url: $item['urlToImage'] ?? null,
+                published_at: $item['publishedAt'] ?? null,
+                author: $item['author'] ?? null,
+                categories: [],
+                source_key: 'newsapi',
+                raw: $item,
+            ), $response->json('articles', []));
         } catch (Throwable $e) {
             Log::error('NewsAPI API fetch failed', ['error' => $e->getMessage()]);
             throw NewsFetchException::providerFailed('NewsAPI', $e->getMessage());
         }
-    }
-
-    public function normalize(array $response): array
-    {
-        return array_map(function ($item) {
-            return [
-                'external_id' => $item['url'] ?? null,
-                'title' => $item['title'] ?? null,
-                'summary' => $item['description'] ?? null,
-                'body' => null,
-                'url' => $item['url'] ?? null,
-                'image_url' => $item['urlToImage'] ?? null,
-                'published_at' => $item['publishedAt'] ?? null,
-                'author' => $item['author'] ?? null,
-                'categories' => [],
-                'source_key' => 'newsapi',
-                'raw' => $item,
-            ];
-        }, $response);
     }
 }

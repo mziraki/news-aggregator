@@ -25,9 +25,9 @@ it('normalizes NewsAPI API response', function () {
     $articles = $service->fetch();
 
     expect($articles)->toHaveCount(1)
-        ->and($articles[0]['title'])->toBe('NewsAPI Title')
-        ->and($articles[0]['author'])->toBe('NewsAPI Author')
-        ->and($articles[0]['source_key'])->toBe('newsapi');
+        ->and($articles[0]->title)->toBe('NewsAPI Title')
+        ->and($articles[0]->author)->toBe('NewsAPI Author')
+        ->and($articles[0]->source_key)->toBe('newsapi');
 });
 
 it('throws exception when NewsAPI API fails', function () {

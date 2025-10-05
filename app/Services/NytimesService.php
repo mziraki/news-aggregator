@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Dtos\ArticleDto;
 use App\Exceptions\NewsFetchException;
 use App\Services\Contracts\NewsProviderServiceContract;
 use Exception;
@@ -26,7 +27,7 @@ class NytimesService implements NewsProviderServiceContract
             ))->toArray());
 
             $items = [];
-            foreach ($responses as $i => $resp) {
+            foreach ($responses as $resp) {
                 if (! $resp->successful()) {
                     throw new Exception('API returned status '.$resp->status());
                 }
@@ -34,29 +35,22 @@ class NytimesService implements NewsProviderServiceContract
                 $items = array_merge($items, $resp->json('response.docs', []));
             }
 
-            return $this->normalize($items);
+            return array_map(fn ($item) => new ArticleDTO(
+                external_id: $item['_id'] ?? null,
+                title: $item['headline']['main'] ?? null,
+                summary: $item['abstract'] ?? null,
+                body: null,
+                url: $item['web_url'] ?? null,
+                image_url: null,
+                published_at: $item['pub_date'] ?? null,
+                author: $item['byline']['original'] ?? null,
+                categories: array_filter([$item['section_name'] ?? null, $item['subsection_name'] ?? null]),
+                source_key: 'nytimes',
+                raw: $item,
+            ), $items);
         } catch (Throwable $e) {
             Log::error('NYTimes API fetch failed', ['error' => $e->getMessage()]);
             throw NewsFetchException::providerFailed('NYTimes', $e->getMessage());
         }
-    }
-
-    public function normalize(array $response): array
-    {
-        return array_map(function ($item) {
-            return [
-                'external_id' => $item['_id'] ?? null,
-                'title' => $item['headline']['main'] ?? null,
-                'summary' => $item['abstract'] ?? null,
-                'body' => null,
-                'url' => $item['web_url'] ?? null,
-                'image_url' => null,
-                'published_at' => $item['pub_date'] ?? null,
-                'author' => $item['byline']['original'] ?? null,
-                'categories' => array_filter([$item['section_name'] ?? null, $item['subsection_name'] ?? null]),
-                'source_key' => 'nytimes',
-                'raw' => $item,
-            ];
-        }, $response);
     }
 }

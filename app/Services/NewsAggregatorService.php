@@ -40,7 +40,7 @@ class NewsAggregatorService implements NewsAggregatorServiceContract
             $articles = $provider->fetch($query);
 
             foreach ($articles as $article) {
-                if (empty($article['external_id']) || empty($article['source_key'])) {
+                if (empty($article->external_id) || empty($article->source_key)) {
                     continue;
                 }
 
@@ -48,25 +48,25 @@ class NewsAggregatorService implements NewsAggregatorServiceContract
 
                 $art = Article::updateOrCreate(
                     [
-                        'external_id' => $article['external_id'],
-                        'source_key' => $article['source_key'],
+                        'external_id' => $article->external_id,
+                        'source_key' => $article->source_key,
                     ],
                     [
-                        'title' => $article['title'] ?? 'No title',
-                        'summary' => $article['summary'] ?? null,
-                        'body' => $article['body'] ?? null,
-                        'url' => $article['url'] ?? null,
-                        'image_url' => $article['image_url'] ?? null,
-                        'author' => $article['author'] ?? null,
-                        'published_at' => isset($article['published_at']) ? Carbon::parse($article['published_at']) : null,
-                        'language' => $article['language'] ?? null,
-                        'raw_json' => $article['raw'] ?? null,
+                        'title' => $article->title ?? 'No title',
+                        'summary' => $article->summary ?? null,
+                        'body' => $article->body ?? null,
+                        'url' => $article->url ?? null,
+                        'image_url' => $article->image_url ?? null,
+                        'author' => $article->author ?? null,
+                        'published_at' => isset($article->published_at) ? Carbon::parse($article->published_at) : null,
+                        'language' => $article->language ?? null,
+                        'raw_json' => $article->raw ?? null,
                     ]
                 );
 
-                if (! empty($article['categories'])) {
+                if (! empty($article->categories)) {
                     $catIds = [];
-                    foreach ($article['categories'] as $catName) {
+                    foreach ($article->categories as $catName) {
                         if (! $catName) {
                             continue;
                         }

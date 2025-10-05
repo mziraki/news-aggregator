@@ -24,13 +24,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->singleton(NewsAggregatorService::class, function ($app) {
-            return new NewsAggregatorService([
-                new GuardianService,
-                new NewsApiService,
-                new NytimesService,
-            ]);
-        });
+        $this->app->singleton(NewsAggregatorService::class, fn ($app) => new NewsAggregatorService([
+            new GuardianService,
+            new NewsApiService,
+            new NytimesService,
+        ]));
 
         $this->app->bind(ArticleServiceContract::class, ArticleService::class);
         $this->app->bind(CategoryServiceContract::class, CategoryService::class);

@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Dtos\ArticleDto;
 use App\Exceptions\NewsFetchException;
 use App\Services\Contracts\NewsProviderServiceContract;
 use Exception;
@@ -26,29 +27,22 @@ class GuardianService implements NewsProviderServiceContract
                 throw new Exception('API returned status '.$response->status());
             }
 
-            return $this->normalize($response->json('response.results', []));
+            return array_map(fn ($item) => new ArticleDTO(
+                external_id: $item['id'] ?? null,
+                title: $item['webTitle'] ?? null,
+                summary: $item['fields']['trailText'] ?? null,
+                body: $item['fields']['bodyText'] ?? null,
+                url: $item['webUrl'] ?? null,
+                image_url: $item['fields']['thumbnail'] ?? null,
+                published_at: $item['webPublicationDate'] ?? null,
+                author: $item['fields']['byline'] ?? null,
+                categories: [$item['sectionName'] ?? null],
+                source_key: 'guardian',
+                raw: $item,
+            ), $response->json('response.results', []));
         } catch (Throwable $e) {
             Log::error('Guardian API fetch failed', ['error' => $e->getMessage()]);
             throw NewsFetchException::providerFailed('Guardian', $e->getMessage());
         }
-    }
-
-    public function normalize(array $response): array
-    {
-        return array_map(function ($item) {
-            return [
-                'external_id' => $item['id'] ?? null,
-                'title' => $item['webTitle'] ?? null,
-                'summary' => $item['fields']['trailText'] ?? null,
-                'body' => $item['fields']['bodyText'] ?? null,
-                'url' => $item['webUrl'] ?? null,
-                'image_url' => $item['fields']['thumbnail'] ?? null,
-                'published_at' => $item['webPublicationDate'] ?? null,
-                'author' => $item['fields']['byline'] ?? null,
-                'categories' => [$item['sectionName'] ?? null],
-                'source_key' => 'guardian',
-                'raw' => $item,
-            ];
-        }, $response);
     }
 }

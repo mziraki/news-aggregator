@@ -29,9 +29,9 @@ it('normalizes Guardian API response', function () {
     $articles = $service->fetch();
 
     expect($articles)->toHaveCount(1)
-        ->and($articles[0]['title'])->toBe('Guardian Title')
-        ->and($articles[0]['author'])->toBe('Guardian Author')
-        ->and($articles[0]['source_key'])->toBe('guardian');
+        ->and($articles[0]->title)->toBe('Guardian Title')
+        ->and($articles[0]->author)->toBe('Guardian Author')
+        ->and($articles[0]->source_key)->toBe('guardian');
 });
 
 it('throws exception when Guardian API fails', function () {

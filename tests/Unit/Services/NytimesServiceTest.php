@@ -28,9 +28,9 @@ it('normalizes NYTimes response', function () {
     $articles = $service->fetch();
 
     expect($articles)->toHaveCount(config('services.nytimes.page_limit'))
-        ->and($articles[0]['title'])->toBe('NYTimes Headline')
-        ->and($articles[0]['author'])->toBe('John')
-        ->and($articles[0]['source_key'])->toBe('nytimes');
+        ->and($articles[0]->title)->toBe('NYTimes Headline')
+        ->and($articles[0]->author)->toBe('John')
+        ->and($articles[0]->source_key)->toBe('nytimes');
 });
 
 it('throws exception when NewsAPI API fails', function () {
