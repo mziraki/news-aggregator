@@ -121,6 +121,7 @@ Pest tests cover:
 
 - APIs
 - Commands
+- DTOs
 - Exceptions
 - Jobs
 - Repositories
