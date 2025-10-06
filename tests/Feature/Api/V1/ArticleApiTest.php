@@ -9,14 +9,14 @@ beforeEach(function () {
 
 it('lists articles with filters', function () {
     $this
-        ->getJson('/api/v1/articles?q=Technology')
+        ->getJson(route('api.v1.articles.index', ['q' => 'Technology'], false))
         ->assertOk()
         ->assertJsonFragment(['title' => 'Technology News']);
 });
 
 it('filters articles by author', function () {
     $this
-        ->getJson('/api/v1/articles?author=John')
+        ->getJson(route('api.v1.articles.index', ['author' => 'John'], false))
         ->assertOk()
         ->assertJsonMissing(['author' => 'Jane']);
 });

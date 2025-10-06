@@ -6,7 +6,7 @@ it('lists categories', function () {
     Category::factory()->create(['name' => 'Technology', 'slug' => 'technology']);
 
     $this
-        ->getJson('/api/v1/categories')
+        ->getJson(route('api.v1.categories.index', absolute: false))
         ->assertOk()
         ->assertJsonFragment(['name' => 'Technology', 'slug' => 'technology']);
 });

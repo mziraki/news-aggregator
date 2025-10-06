@@ -23,7 +23,7 @@ class PreferenceController extends Controller
 
         return response()->json([
             'message' => 'Preferences updated successfully',
-            'data' => $this->service->getPreferences($user->getKey())->toArray(),
+            'data' => PreferenceResource::make($user),
         ]);
     }
 }

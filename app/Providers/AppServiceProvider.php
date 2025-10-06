@@ -2,8 +2,8 @@
 
 namespace App\Providers;
 
-use App\Repositories\ArticleRepository;
-use App\Repositories\CategoryRepository;
+use App\Repositories\Contracts\ArticleRepositoryContract;
+use App\Repositories\Contracts\CategoryRepositoryContract;
 use App\Services\ArticleService;
 use App\Services\CategoryService;
 use App\Services\Contracts\ArticleServiceContract;
@@ -27,7 +27,10 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(NewsAggregatorService::class, function ($app) {
-            $service = new NewsAggregatorService(new ArticleRepository, new CategoryRepository);
+            $service = new NewsAggregatorService(
+                resolve(ArticleRepositoryContract::class),
+                resolve(CategoryRepositoryContract::class),
+            );
             $service->setProviders([
                 new GuardianService,
                 new NewsApiService,
