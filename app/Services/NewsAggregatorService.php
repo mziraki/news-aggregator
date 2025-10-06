@@ -3,8 +3,8 @@
 namespace App\Services;
 
 use App\Exceptions\NewsFetchException;
-use App\Models\Article;
-use App\Models\Category;
+use App\Repositories\Contracts\ArticleRepositoryContract;
+use App\Repositories\Contracts\CategoryRepositoryContract;
 use App\Services\Contracts\NewsAggregatorServiceContract;
 use App\Services\Contracts\NewsProviderServiceContract;
 use Carbon\Carbon;
@@ -15,7 +15,17 @@ use Throwable;
 
 class NewsAggregatorService implements NewsAggregatorServiceContract
 {
-    public function __construct(protected array $providers = []) {}
+    protected array $providers = [];
+
+    public function __construct(
+        protected ArticleRepositoryContract $articleRepository,
+        protected CategoryRepositoryContract $categoryRepository,
+    ) {}
+
+    public function setProviders(array $providers): void
+    {
+        $this->providers = $providers;
+    }
 
     public function getProviders(): array
     {
@@ -44,41 +54,43 @@ class NewsAggregatorService implements NewsAggregatorServiceContract
                     continue;
                 }
 
-                DB::beginTransaction();
+                DB::transaction(function () use ($article) {
+                    $art = $this
+                        ->articleRepository
+                        ->query()
+                        ->updateOrCreate([
+                            'external_id' => $article->external_id,
+                            'source_key' => $article->source_key,
+                        ],
+                            [
+                                'title' => $article->title ?? 'No title',
+                                'summary' => $article->summary ?? null,
+                                'body' => $article->body ?? null,
+                                'url' => $article->url ?? null,
+                                'image_url' => $article->image_url ?? null,
+                                'author' => $article->author ?? null,
+                                'published_at' => isset($article->published_at) ? Carbon::parse($article->published_at) : null,
+                                'language' => $article->language ?? null,
+                                'raw_json' => $article->raw ?? null,
+                            ]);
 
-                $art = Article::updateOrCreate(
-                    [
-                        'external_id' => $article->external_id,
-                        'source_key' => $article->source_key,
-                    ],
-                    [
-                        'title' => $article->title ?? 'No title',
-                        'summary' => $article->summary ?? null,
-                        'body' => $article->body ?? null,
-                        'url' => $article->url ?? null,
-                        'image_url' => $article->image_url ?? null,
-                        'author' => $article->author ?? null,
-                        'published_at' => isset($article->published_at) ? Carbon::parse($article->published_at) : null,
-                        'language' => $article->language ?? null,
-                        'raw_json' => $article->raw ?? null,
-                    ]
-                );
-
-                if (! empty($article->categories)) {
-                    $catIds = [];
-                    foreach ($article->categories as $catName) {
-                        if (! $catName) {
-                            continue;
+                    if (! empty($article->categories)) {
+                        $catIds = [];
+                        foreach ($article->categories as $catName) {
+                            if (! $catName) {
+                                continue;
+                            }
+                            $cat = $this
+                                ->categoryRepository
+                                ->query()
+                                ->firstOrCreate(['slug' => Str::slug($catName)], ['name' => $catName]);
+                            $catIds[] = $cat->getKey();
                         }
-                        $cat = Category::firstOrCreate(['slug' => Str::slug($catName)], ['name' => $catName]);
-                        $catIds[] = $cat->getKey();
+                        if (! empty($catIds)) {
+                            $art->categories()->syncWithoutDetaching($catIds);
+                        }
                     }
-                    if (! empty($catIds)) {
-                        $art->categories()->syncWithoutDetaching($catIds);
-                    }
-                }
-
-                Db::commit();
+                });
             }
 
             return $articles;

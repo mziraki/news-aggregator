@@ -2,11 +2,11 @@
 
 namespace App\Services\Contracts;
 
-use App\Models\User;
+use Illuminate\Database\Eloquent\Model;
 
 interface UserServiceContract
 {
-    public function getPreferences(int $userId): User;
+    public function getPreferences(int $userId): Model;
 
-    public function updatePreferences(int $userId, array $preferences): User;
+    public function updatePreferences(int $userId, array $preferences): Model;
 }

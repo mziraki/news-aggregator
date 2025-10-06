@@ -6,6 +6,8 @@ use App\Exceptions\NewsFetchException;
 
 interface NewsAggregatorServiceContract
 {
+    public function setProviders(array $providers): void;
+
     public function getProviders(): array;
 
     /**

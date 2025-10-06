@@ -1,8 +1,17 @@
 <?php
 
 use App\Exceptions\NewsFetchException;
+use App\Repositories\Contracts\ArticleRepositoryContract;
+use App\Repositories\Contracts\CategoryRepositoryContract;
 use App\Services\Contracts\NewsProviderServiceContract;
 use App\Services\NewsAggregatorService;
+
+beforeEach(function () {
+    $this->service = new NewsAggregatorService(
+        Mockery::mock(ArticleRepositoryContract::class),
+        Mockery::mock(CategoryRepositoryContract::class),
+    );
+});
 
 it('fetches and stores articles from multiple providers', function () {
     $provider1 = Mockery::mock(NewsProviderServiceContract::class);
@@ -15,8 +24,8 @@ it('fetches and stores articles from multiple providers', function () {
         ['external_id' => '2', 'source_key' => 'nytimes', 'title' => 'From Provider2', 'url' => fake()->url()],
     ]);
 
-    $service = new NewsAggregatorService([$provider1, $provider2]);
-    $articles = $service->fetchAndStore();
+    $this->service->setProviders([$provider1, $provider2]);
+    $articles = $this->service->fetchAndStore();
 
     expect($articles)->toHaveCount(2)
         ->and($articles[0]['title'])->toBe('From Provider1')
@@ -27,8 +36,8 @@ it('throws NewsFetchException if provider fails', function () {
     $provider = Mockery::mock(NewsProviderServiceContract::class);
     $provider->shouldReceive('fetch')->andThrow(new Exception('API down'));
 
-    $service = new NewsAggregatorService([$provider]);
+    $this->service->setProviders([$provider]);
 
     $this->expectException(NewsFetchException::class);
-    $service->fetchAndStore();
+    $this->service->fetchAndStore();
 });
